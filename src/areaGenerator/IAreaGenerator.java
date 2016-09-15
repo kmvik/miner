@@ -9,7 +9,8 @@ public interface IAreaGenerator {
     public double interval = 1;
     public double heightPoint = 30;
     public double widthPoint = 30;
-    List<IPoint> generateArea();
+    List<PointBase> generateArea();
     void fillPositionsPoints();
     void fillNumbers();
+    void openEmptyArea(List<PointBase> points, PointBase currPoint);
 }

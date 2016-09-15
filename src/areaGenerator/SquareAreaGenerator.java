@@ -11,7 +11,7 @@ public class SquareAreaGenerator implements IAreaGenerator {
     private int _areaWidth;
     private double heightPx;
     private double widthPx;
-    private List<IPoint> points;
+    private List<PointBase> points;
     private IBombGenerator bombGenerator;
     private int _bombsCount;
 
@@ -27,7 +27,7 @@ public class SquareAreaGenerator implements IAreaGenerator {
     }
 
     @Override
-    public List<IPoint> generateArea() {
+    public List<PointBase> generateArea() {
         fillPositionsPoints();
         bombGenerator.generateBombs(points, _bombsCount);
         fillNumbers();
@@ -47,7 +47,7 @@ public class SquareAreaGenerator implements IAreaGenerator {
 
     @Override
     public void fillNumbers() {
-        IPoint[][] matrix = new IPoint[_areaHeight][_areaWidth];
+        PointBase[][] matrix = new PointBase[_areaHeight][_areaWidth];
         int k = 0;
         for (int i = 0; i < _areaHeight; i++) {
             for (int j = 0; j < _areaWidth; j++) {
@@ -93,56 +93,10 @@ public class SquareAreaGenerator implements IAreaGenerator {
                 points.add(matrix[i][j]);
             }
         }
+    }
 
+    @Override
+    public void openEmptyArea(List<PointBase> points, PointBase currPoint) {
 
-//        for (int i = 0; i < _areaWidth * _areaHeight - 1; i++) {
-//            int diagUpLeftIndex =  i - _areaWidth - 1;
-//            int upIndex = i - _areaWidth;
-//            int diagUpRightIndex = i - _areaWidth + 1;
-//            int leftIndex = i - 1;
-//            int rightIndex = i + 1;
-//            int diagDownLeftIndex = i + _areaWidth - 1;
-//            int downIndex = i + _areaWidth;
-//            int diagDownRightIndex = i + _areaWidth + 1;
-//            if (points.get(i).hasBomb()) {
-//                if (i % _areaWidth > 0) {
-//                    if (!points.get(diagUpLeftIndex).hasBomb() && diagUpLeftIndex > 0) {
-//                        int currNumber = points.get(diagUpLeftIndex).getNumber();
-//                        points.get(diagUpLeftIndex).setNumber(currNumber + 1);
-//                    }
-//                    if (!points.get(leftIndex).hasBomb() && leftIndex > 0) {
-//                        int currNumber = points.get(leftIndex).getNumber();
-//                        points.get(leftIndex).setNumber(currNumber + 1);
-//                    }
-//                    if (!points.get(diagDownLeftIndex).hasBomb() && diagDownLeftIndex > 0) {
-//                        int currNumber = points.get(diagDownLeftIndex).getNumber();
-//                        points.get(diagDownLeftIndex).setNumber(currNumber + 1);
-//                    }
-//
-//                }
-//                if (i < _areaWidth) {
-//                    if (!points.get(diagUpRightIndex).hasBomb()) {
-//                        int currNumber = points.get(diagUpRightIndex).getNumber();
-//                        points.get(diagUpRightIndex).setNumber(currNumber + 1);
-//                    }
-//                    if (!points.get(rightIndex).hasBomb()) {
-//                        int currNumber = points.get(rightIndex).getNumber();
-//                        points.get(rightIndex).setNumber(currNumber + 1);
-//                    }
-//                    if (!points.get(diagDownRightIndex).hasBomb()) {
-//                        int currNumber = points.get(diagDownRightIndex).getNumber();
-//                        points.get(diagDownRightIndex).setNumber(currNumber + 1);
-//                    }
-//                }
-//                if (upIndex > 0 && !points.get(upIndex).hasBomb()) {
-//                    int currNumber = points.get(upIndex).getNumber();
-//                    points.get(upIndex).setNumber(currNumber + 1);
-//                }
-//                if (downIndex < points.size() && !points.get(downIndex).hasBomb()) {
-//                    int currNumber = points.get(downIndex).getNumber();
-//                    points.get(downIndex).setNumber(currNumber + 1);
-//                }
-//            }
-//        }
     }
 }

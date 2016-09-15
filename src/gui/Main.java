@@ -1,10 +1,8 @@
 package gui;
 
-import areaGenerator.IPoint;
+import areaGenerator.PointBase;
 import areaGenerator.SquareAreaGenerator;
 import javafx.application.Application;
-import javafx.application.Platform;
-import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
@@ -33,14 +31,12 @@ public class Main extends Application {
         Group root = new Group();
         Canvas canvasBomb = new Canvas(n * 31, m * 31);
         Canvas canvasTop = new Canvas(n * 31, m * 31);
-//        Canvas flagsLayer = new Canvas(n *31, m * 31);
         GraphicsContext gc = canvasBomb.getGraphicsContext2D();
         GraphicsContext gc2 = canvasTop.getGraphicsContext2D();
-//        GraphicsContext gc3 = flagsLayer.getGraphicsContext2D();
         canvasTop.toFront();
-        List<IPoint> points = sag.generateArea();
+        List<PointBase> points = sag.generateArea();
 
-        for (IPoint point : points) {
+        for (PointBase point : points) {
             gc2.setFill(Color.GREEN);
             gc2.fillRoundRect(point.getPositionX(), point.getPositionY(), sag.widthPoint, sag.heightPoint, 10, 10);
             if (point.hasBomb()) {
@@ -55,56 +51,46 @@ public class Main extends Application {
             }
         }
 
-        canvasTop.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                double x = event.getSceneX();
-                double y = event.getSceneY();
-                for (IPoint point : points) {
-                    if (x >= point.getPositionX() && x < point.getPositionX() + sag.widthPoint &&
-                            y >= point.getPositionY() && y < point.getPositionY() + sag.heightPoint) {
-                        if (event.getButton() == MouseButton.PRIMARY) {
-                            if (point.hasBomb()) {
-                                gc2.clearRect(point.getPositionX(), point.getPositionY(), sag.widthPoint, sag.heightPoint);
-                                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-                                alert.setTitle("Game over");
-                                alert.setHeaderText(null);
-                                alert.setContentText("Вы всё взорвали =( Хотите сыграть еще раз?");
-                                Optional<ButtonType> result = alert.showAndWait();
-                                if (result.get() == ButtonType.OK){
+        canvasTop.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+            double x = event.getSceneX();
+            double y = event.getSceneY();
+            for (PointBase point : points) {
+                if (x >= point.getPositionX() && x < point.getPositionX() + sag.widthPoint &&
+                        y >= point.getPositionY() && y < point.getPositionY() + sag.heightPoint) {
+                    if (event.getButton() == MouseButton.PRIMARY && !point.hasFlag()) {
+                        gc2.clearRect(point.getPositionX(), point.getPositionY(), sag.widthPoint, sag.heightPoint);
+                        point.setIsOpen(true);
+                        if (point.hasBomb()) {
+                            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                            alert.setTitle("Game over");
+                            alert.setHeaderText(null);
+                            alert.setContentText("Вы всё взорвали =( Хотите сыграть еще раз?");
+                            Optional<ButtonType> result = alert.showAndWait();
+                            if (result.get() == ButtonType.OK){
 
-                                } else {
-                                    primaryStage.close();
-                                }
                             } else {
-                                gc2.clearRect(point.getPositionX(), point.getPositionY(), sag.widthPoint, sag.heightPoint);
+                                primaryStage.close();
                             }
+                        }
+                        if (point.getNumber() == 0) {
+                            sag.openEmptyArea(points, point);
+                        }
+                    }
+                    if (event.getButton() == MouseButton.SECONDARY) {
+                        if (point.hasFlag()) {
+                            gc2.fillRoundRect(point.getPositionX(), point.getPositionY(), sag.widthPoint, sag.heightPoint, 10, 10);
+                            point.setHasFlag(false);
+                        } else {
+                            gc2.drawImage(new Image("/flag.png"),point.getPositionX()+3,point.getPositionY()+3);
+                            point.setHasFlag(true);
                         }
                     }
                 }
             }
         });
 
-//        flagsLayer.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
-//            @Override
-//            public void handle(MouseEvent event) {
-//                double x = event.getSceneX();
-//                double y = event.getSceneY();
-//                for (IPoint point : points) {
-//                    if (x >= point.getPositionX() && x < point.getPositionX() + sag.widthPoint &&
-//                            y >= point.getPositionY() && y < point.getPositionY() + sag.heightPoint) {
-//                        if (event.getButton() == MouseButton.SECONDARY) {
-//                            flagsLayer.toFront();
-//                            gc3.drawImage(new Image("/flag.png"),point.getPositionX()+3,point.getPositionY()+3);
-//                        }
-//                    }
-//                }
-//            }
-//        });
-
         root.getChildren().add(canvasBomb);
         root.getChildren().add(canvasTop);
-//        root.getChildren().add(flagsLayer);
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
     }
