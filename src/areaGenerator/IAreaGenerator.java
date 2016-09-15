@@ -12,5 +12,5 @@ public interface IAreaGenerator {
     List<PointBase> generateArea();
     void fillPositionsPoints();
     void fillNumbers();
-    void openEmptyArea(List<PointBase> points, PointBase currPoint);
+    List<PointBase> openEmptyArea(List<PointBase> points, PointBase currPoint);
 }

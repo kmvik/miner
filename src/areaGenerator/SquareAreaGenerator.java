@@ -54,58 +54,98 @@ public class SquareAreaGenerator implements IAreaGenerator {
         }
     }
 
-    @Override
-    public void fillNumbers() {
-        PointBase[][] matrix = new PointBase[areaHeight][areaWidth];
+    private PointBase[][] convertToArray(List<PointBase> pointsList) {
+        PointBase[][] pointsArray = new PointBase[areaHeight][areaWidth];
         int k = 0;
         for (int i = 0; i < areaHeight; i++) {
             for (int j = 0; j < areaWidth; j++) {
-                matrix[i][j] = points.get(k);
+                pointsArray[i][j] = pointsList.get(k);
                 k++;
             }
         }
+        return pointsArray;
+    }
+
+    private List<PointBase> convertToPointsList(PointBase[][] pointsArray) {
+        List<PointBase> pointsList = new ArrayList<>();
+        for (int i = 0; i < areaHeight; i++) {
+            for (int j = 0; j < areaWidth; j++) {
+                pointsList.add(pointsArray[i][j]);
+            }
+        }
+        return pointsList;
+    }
+
+    @Override
+    public void fillNumbers() {
+        PointBase[][] pointsArray = convertToArray(points);
 
         for (int i = 0; i < areaHeight; i++) {
             for (int j = 0; j < areaWidth; j++) {
-                if (matrix[i][j].hasBomb()) {
+                if (pointsArray[i][j].hasBomb()) {
                     if (j - 1 >= 0) {
                         if (i-1 >= 0) {
-                            matrix[i-1][j-1].setNumber(matrix[i-1][j-1].getNumber() + 1);
+                            pointsArray[i-1][j-1].setNumber(pointsArray[i-1][j-1].getNumber() + 1);
                         }
-                        matrix[i][j-1].setNumber(matrix[i][j-1].getNumber() + 1);
+                        pointsArray[i][j-1].setNumber(pointsArray[i][j-1].getNumber() + 1);
                         if (i+1 < areaHeight) {
-                            matrix[i+1][j-1].setNumber(matrix[i+1][j-1].getNumber() + 1);
+                            pointsArray[i+1][j-1].setNumber(pointsArray[i+1][j-1].getNumber() + 1);
                         }
                     }
                     if (j + 1 < areaWidth) {
                         if (i-1 >= 0) {
-                            matrix[i - 1][j + 1].setNumber(matrix[i - 1][j + 1].getNumber() + 1);
+                            pointsArray[i - 1][j + 1].setNumber(pointsArray[i - 1][j + 1].getNumber() + 1);
                         }
-                        matrix[i][j+1].setNumber(matrix[i][j+1].getNumber() + 1);
+                        pointsArray[i][j+1].setNumber(pointsArray[i][j+1].getNumber() + 1);
                         if (i+1 < areaHeight) {
-                            matrix[i+1][j+1].setNumber(matrix[i+1][j+1].getNumber() + 1);
+                            pointsArray[i+1][j+1].setNumber(pointsArray[i+1][j+1].getNumber() + 1);
                         }
                     }
                     if (i - 1 >= 0) {
-                        matrix[i-1][j].setNumber(matrix[i-1][j].getNumber() + 1);
+                        pointsArray[i-1][j].setNumber(pointsArray[i-1][j].getNumber() + 1);
                     }
                     if (i + 1 < areaHeight) {
-                        matrix[i+1][j].setNumber(matrix[i+1][j].getNumber() + 1);
+                        pointsArray[i+1][j].setNumber(pointsArray[i+1][j].getNumber() + 1);
                     }
                 }
             }
         }
 
-        points = new ArrayList<>();
-        for (int i = 0; i < areaHeight; i++) {
-            for (int j = 0; j < areaWidth; j++) {
-                points.add(matrix[i][j]);
-            }
-        }
+        points = convertToPointsList(pointsArray);
     }
 
     @Override
-    public void openEmptyArea(List<PointBase> points, PointBase currPoint) {
+    public List<PointBase> openEmptyArea(List<PointBase> points, PointBase currPoint) {
+        PointBase[][] pointsArray = convertToArray(points);
+        for (int i = 0; i < areaHeight; i++) {
+            for (int j = 0; j < areaWidth; j++) {
+                if (pointsArray[i][j].equals(currPoint)) {
+                    openPoints(i, j, pointsArray);
+                }
+            }
+        }
+        return convertToPointsList(pointsArray);
+    }
 
+    private void openPoints(int i, int j, PointBase[][] pointsArray) {
+        if (!pointsArray[i][j].hasBomb() && pointsArray[i][j].getNumber() == 0) {
+            pointsArray[i][j].setIsOpen(true);
+            pointsArray[i-1][j-1].setIsOpen(true);
+            openPoints(i-1, j-1, pointsArray);
+            pointsArray[i][j-1].setIsOpen(true);
+            openPoints(i, j-1, pointsArray);
+            pointsArray[i+1][j-1].setIsOpen(true);
+            openPoints(i+1, j-1, pointsArray);
+            pointsArray[i-1][j].setIsOpen(true);
+            openPoints(i-1, j, pointsArray);
+            pointsArray[i+1][j].setIsOpen(true);
+            openPoints(i+1, j, pointsArray);
+            pointsArray[i-1][j+1].setIsOpen(true);
+            openPoints(i-1, j+1, pointsArray);
+            pointsArray[i][j+1].setIsOpen(true);
+            openPoints(i, j+1, pointsArray);
+            pointsArray[i+1][j+1].setIsOpen(true);
+            openPoints(i+1, j+1, pointsArray);
+        }
     }
 }

@@ -17,26 +17,29 @@ public class DrawerAreaWithSquarePoints {
     private double areaWidth;
     private final int ARC = 10;
     private Canvas cBombs;
+    private GraphicsContext gcBombs;
     private Canvas cTop;
+    private GraphicsContext gcTop;
 
     public DrawerAreaWithSquarePoints (double areaHeight, double areaWidth) {
         this.areaHeight = areaHeight;
         this.areaWidth = areaWidth;
         cBombs = new Canvas(areaWidth, areaHeight);
         cTop = new Canvas(areaWidth, areaHeight);
+        gcBombs = cBombs.getGraphicsContext2D();
+        gcTop = cTop.getGraphicsContext2D();
     }
 
     public Canvas drawLayoutWithBombs(List<PointBase> points) {
-        GraphicsContext gc = cBombs.getGraphicsContext2D();
         for (PointBase point : points) {
             if (point.hasBomb()) {
-                gc.drawImage(new Image(BOMB_PATH),point.getPositionX()+3,point.getPositionY()+3);
+                gcBombs.drawImage(new Image(BOMB_PATH),point.getPositionX()+3,point.getPositionY()+3);
             } else {
                 int y = 20;
                 int x = 13;
-                gc.setFill(Color.BLACK);
+                gcBombs.setFill(Color.BLACK);
                 if (point.getNumber() != 0) {
-                    gc.fillText(String.valueOf(point.getNumber()), point.getPositionX() + x, point.getPositionY() + y);
+                    gcBombs.fillText(String.valueOf(point.getNumber()), point.getPositionX() + x, point.getPositionY() + y);
                 }
             }
         }
@@ -44,11 +47,14 @@ public class DrawerAreaWithSquarePoints {
     }
 
     public Canvas drawTopLayout(List<PointBase> points) {
-        GraphicsContext gc2 = cTop.getGraphicsContext2D();
         for (PointBase point : points) {
-            gc2.setFill(Color.GREEN);
-            gc2.fillRoundRect(point.getPositionX(), point.getPositionY(), point.getPointWidth(), point.getPointHeight(), ARC, ARC);
+            gcTop.setFill(Color.GREEN);
+            gcTop.fillRoundRect(point.getPositionX(), point.getPositionY(), point.getPointWidth(), point.getPointHeight(), ARC, ARC);
         }
         return cTop;
+    }
+
+    public void clearTopLayoutOnPoint(PointBase point) {
+        gcTop.clearRect(point.getPositionX(), point.getPositionY(), point.getPointWidth(), point.getPointHeight());
     }
 }

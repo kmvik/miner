@@ -15,6 +15,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class Main extends Application {
 
@@ -35,40 +36,39 @@ public class Main extends Application {
         GraphicsContext gc2 = canvasTop.getGraphicsContext2D();
         canvasTop.toFront();
 
+
+
         canvasTop.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
             double x = event.getSceneX();
             double y = event.getSceneY();
-            for (PointBase point : points) {
-                if (x >= point.getPositionX() && x < point.getPositionX() + sag.widthPoint &&
-                        y >= point.getPositionY() && y < point.getPositionY() + sag.heightPoint) {
-                    if (event.getButton() == MouseButton.PRIMARY && !point.hasFlag()) {
-                        gc2.clearRect(point.getPositionX(), point.getPositionY(), sag.widthPoint, sag.heightPoint);
-                        point.setIsOpen(true);
-                        if (point.hasBomb()) {
-                            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-                            alert.setTitle("Game over");
-                            alert.setHeaderText(null);
-                            alert.setContentText("Вы всё взорвали =( Хотите сыграть еще раз?");
-                            Optional<ButtonType> result = alert.showAndWait();
-                            if (result.get() == ButtonType.OK){
-                                // перезагрузка приложения
-                            } else {
-                                primaryStage.close();
-                            }
-                        }
-                        if (point.getNumber() == 0) {
-                            sag.openEmptyArea(points, point);
-                        }
+            PointBase pointClicked = points.stream().filter(a -> x >= a.getPositionX() && x < a.getPositionX() + a.getPointWidth()
+            && y >= a.getPositionY() && y < a.getPositionY() + sag.heightPoint).collect(Collectors.toList()).get(0);
+            if (event.getButton() == MouseButton.PRIMARY && !pointClicked.hasFlag()) {
+                gc2.clearRect(pointClicked.getPositionX(), pointClicked.getPositionY(), sag.widthPoint, sag.heightPoint);
+                pointClicked.setIsOpen(true);
+                if (pointClicked.hasBomb()) {
+                    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                    alert.setTitle("Game over");
+                    alert.setHeaderText(null);
+                    alert.setContentText("Вы всё взорвали =( Хотите сыграть еще раз?");
+                    Optional<ButtonType> result = alert.showAndWait();
+                    if (result.get() == ButtonType.OK){
+                        // перезагрузка приложения
+                    } else {
+                        primaryStage.close();
                     }
-                    if (event.getButton() == MouseButton.SECONDARY && !point.hasBomb()) {
-                        if (point.hasFlag()) {
-                            gc2.fillRoundRect(point.getPositionX(), point.getPositionY(), sag.widthPoint, sag.heightPoint, 10, 10);
-                            point.setHasFlag(false);
-                        } else {
-                            gc2.drawImage(new Image("/flag.png"),point.getPositionX()+3,point.getPositionY()+3);
-                            point.setHasFlag(true);
-                        }
-                    }
+                }
+                if (pointClicked.getNumber() == 0) {
+                    sag.openEmptyArea(points, pointClicked).stream().filter(p -> p.isOpen()).collect(Collectors.toList()).forEach(drawer::clearTopLayoutOnPoint);
+                }
+            }
+            if (event.getButton() == MouseButton.SECONDARY && !pointClicked.isOpen()) {
+                if (pointClicked.hasFlag()) {
+                    gc2.fillRoundRect(pointClicked.getPositionX(), pointClicked.getPositionY(), sag.widthPoint, sag.heightPoint, 10, 10);
+                    pointClicked.setHasFlag(false);
+                } else {
+                    gc2.drawImage(new Image("/flag.png"),pointClicked.getPositionX()+3,pointClicked.getPositionY()+3);
+                    pointClicked.setHasFlag(true);
                 }
             }
         });
