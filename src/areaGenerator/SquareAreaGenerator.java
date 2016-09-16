@@ -127,25 +127,72 @@ public class SquareAreaGenerator implements IAreaGenerator {
         return convertToPointsList(pointsArray);
     }
 
+    private void openNumber(PointBase point) {
+        if (point.getNumber() > 0) {
+            point.setIsOpen(true);
+        }
+    }
+
     private void openPoints(int i, int j, PointBase[][] pointsArray) {
-        if (!pointsArray[i][j].hasBomb() && pointsArray[i][j].getNumber() == 0) {
+        if (pointsArray[i][j].getNumber() == 0 && !pointsArray[i][j].isOpen() && !pointsArray[i][j].hasBomb()) {
             pointsArray[i][j].setIsOpen(true);
-            pointsArray[i-1][j-1].setIsOpen(true);
-            openPoints(i-1, j-1, pointsArray);
-            pointsArray[i][j-1].setIsOpen(true);
-            openPoints(i, j-1, pointsArray);
-            pointsArray[i+1][j-1].setIsOpen(true);
-            openPoints(i+1, j-1, pointsArray);
-            pointsArray[i-1][j].setIsOpen(true);
-            openPoints(i-1, j, pointsArray);
-            pointsArray[i+1][j].setIsOpen(true);
-            openPoints(i+1, j, pointsArray);
-            pointsArray[i-1][j+1].setIsOpen(true);
-            openPoints(i-1, j+1, pointsArray);
-            pointsArray[i][j+1].setIsOpen(true);
-            openPoints(i, j+1, pointsArray);
-            pointsArray[i+1][j+1].setIsOpen(true);
-            openPoints(i+1, j+1, pointsArray);
+            if (j - 1 >= 0) {
+                if (i-1 >= 0) {
+                    openNumber(pointsArray[i-1][j-1]);
+                    openPoints(i-1, j-1, pointsArray);
+                }
+                openNumber(pointsArray[i][j-1]);
+                openPoints(i, j-1, pointsArray);
+                if (i+1 < areaHeight) {
+                    openNumber(pointsArray[i+1][j-1]);
+                    openPoints(i+1, j-1, pointsArray);
+                }
+            }
+            if (j + 1 < areaWidth) {
+                if (i-1 >= 0) {
+                    openNumber(pointsArray[i-1][j+1]);
+                    openPoints(i-1, j+1, pointsArray);
+                }
+                openNumber(pointsArray[i][j+1]);
+                openPoints(i, j+1, pointsArray);
+                if (i+1 < areaHeight) {
+                    openNumber(pointsArray[i+1][j+1]);
+                    openPoints(i+1, j+1, pointsArray);
+                }
+            }
+            if (i - 1 >= 0) {
+                openNumber(pointsArray[i-1][j]);
+                openPoints(i-1, j, pointsArray);
+            }
+            if (i + 1 < areaHeight) {
+                openNumber(pointsArray[i+1][j]);
+                openPoints(i+1, j, pointsArray);
+            }
+//
+//            pointsArray[i-1][j-1].setIsOpen(true);
+//            openPoints(i-1, j-1, pointsArray);
+//
+//            pointsArray[i][j-1].setIsOpen(true);
+//            openPoints(i, j-1, pointsArray);
+//
+//            pointsArray[i+1][j-1].setIsOpen(true);
+//            openPoints(i+1, j-1, pointsArray);
+//
+//            pointsArray[i-1][j].setIsOpen(true);
+//            openPoints(i-1, j, pointsArray);
+//
+//            pointsArray[i+1][j].setIsOpen(true);
+//            openPoints(i+1, j, pointsArray);
+//
+//            pointsArray[i-1][j+1].setIsOpen(true);
+//            openPoints(i-1, j+1, pointsArray);
+//
+//
+//            pointsArray[i][j+1].setIsOpen(true);
+//            openPoints(i, j+1, pointsArray);
+//
+//            pointsArray[i+1][j+1].setIsOpen(true);
+//            openPoints(i+1, j+1, pointsArray);
         }
     }
 }

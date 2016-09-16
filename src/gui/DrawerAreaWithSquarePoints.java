@@ -54,7 +54,11 @@ public class DrawerAreaWithSquarePoints {
         return cTop;
     }
 
-    public void clearTopLayoutOnPoint(PointBase point) {
-        gcTop.clearRect(point.getPositionX(), point.getPositionY(), point.getPointWidth(), point.getPointHeight());
+    public void clearTopLayoutOnPoint(List<PointBase> points) {
+        for (PointBase p : points) {
+            if (p.isOpen()) {
+                gcTop.clearRect(p.getPositionX(), p.getPositionY(), p.getPointWidth(), p.getPointHeight());
+            }
+        }
     }
 }

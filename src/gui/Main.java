@@ -23,7 +23,7 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception{
         int n = 10;
         int m = 10;
-        int bombsCount = 20;
+        int bombsCount = 15;
 
         SquareAreaGenerator sag = new SquareAreaGenerator(n, m, bombsCount);
 
@@ -45,7 +45,7 @@ public class Main extends Application {
             && y >= a.getPositionY() && y < a.getPositionY() + sag.heightPoint).collect(Collectors.toList()).get(0);
             if (event.getButton() == MouseButton.PRIMARY && !pointClicked.hasFlag()) {
                 gc2.clearRect(pointClicked.getPositionX(), pointClicked.getPositionY(), sag.widthPoint, sag.heightPoint);
-                pointClicked.setIsOpen(true);
+//                pointClicked.setIsOpen(true);
                 if (pointClicked.hasBomb()) {
                     Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                     alert.setTitle("Game over");
@@ -59,7 +59,7 @@ public class Main extends Application {
                     }
                 }
                 if (pointClicked.getNumber() == 0) {
-                    sag.openEmptyArea(points, pointClicked).stream().filter(p -> p.isOpen()).collect(Collectors.toList()).forEach(drawer::clearTopLayoutOnPoint);
+                    drawer.clearTopLayoutOnPoint(sag.openEmptyArea(points, pointClicked).stream().filter(p -> p.isOpen()).collect(Collectors.toList()));
                 }
             }
             if (event.getButton() == MouseButton.SECONDARY && !pointClicked.isOpen()) {
