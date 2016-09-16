@@ -8,7 +8,7 @@ import java.util.Random;
  */
 public class RandomizeBombGenerator implements IBombGenerator {
     @Override
-    public List<IPoint> generateBombs(List<IPoint> points, int countOfBombs) {
+    public List<PointBase> generateBombs(List<PointBase> points, int countOfBombs) {
         int pointsCount = points.size();
         Random random = new Random();
         while (countOfBombs > 0) {
