@@ -10,6 +10,8 @@ public class SquareAreaGenerator implements IAreaGenerator {
     private int areaHeight;
     private int areaWidth;
     private double areaHeightPx;
+    private double heightPoint;
+    private double widthPoint;
 
     public double getAreaWidthPx() {
         return areaWidthPx;
@@ -18,17 +20,29 @@ public class SquareAreaGenerator implements IAreaGenerator {
     private double areaWidthPx;
     private List<PointBase> points;
     private IBombGenerator bombGenerator;
-    private int _bombsCount;
+    private int bombsCount;
+
+    public int getMarkedBombs() {
+        return markedBombs;
+    }
+
+    public void setMarkedBombs(int markedBombs) {
+        this.markedBombs = markedBombs;
+    }
+
+    private int markedBombs;
 
 
-    public SquareAreaGenerator(int areaHeight, int areaWidth, int bombsCount) {
+    public SquareAreaGenerator(int areaHeight, int areaWidth, int bombsCount, double heightPoint, double widthPoint) {
         this.areaHeight = areaHeight;
         this.areaWidth = areaWidth;
-        areaHeightPx = this.areaHeight * (heightPoint + interval);
-        areaWidthPx = this.areaWidth * (widthPoint + interval);
+        this.heightPoint = heightPoint;
+        this.widthPoint = widthPoint;
+        areaHeightPx = this.areaHeight * (this.heightPoint + interval);
+        areaWidthPx = this.areaWidth * (this.widthPoint + interval);
         points = new ArrayList<>();
         bombGenerator = new RandomizeBombGenerator();
-        _bombsCount = bombsCount;
+        this.bombsCount = bombsCount;
     }
 
     public double getAreaHeightPx() {
@@ -38,7 +52,7 @@ public class SquareAreaGenerator implements IAreaGenerator {
     @Override
     public List<PointBase> generateArea() {
         fillPositionsPoints();
-        bombGenerator.generateBombs(points, _bombsCount);
+        bombGenerator.generateBombs(points, bombsCount);
         fillNumbers();
         return points;
     }
@@ -48,7 +62,7 @@ public class SquareAreaGenerator implements IAreaGenerator {
         for (int i = 0; i < areaWidthPx; i++) {
             for (int j = 0; j < areaHeightPx; j++) {
                 if (i % (widthPoint + interval) == 0 && j % (heightPoint + interval) == 0) {
-                    points.add(new SquarePoint(i, j));
+                    points.add(new SquarePoint(i, j, heightPoint, widthPoint));
                 }
             }
         }
@@ -168,31 +182,6 @@ public class SquareAreaGenerator implements IAreaGenerator {
                 openNumber(pointsArray[i+1][j]);
                 openPoints(i+1, j, pointsArray);
             }
-//
-//            pointsArray[i-1][j-1].setIsOpen(true);
-//            openPoints(i-1, j-1, pointsArray);
-//
-//            pointsArray[i][j-1].setIsOpen(true);
-//            openPoints(i, j-1, pointsArray);
-//
-//            pointsArray[i+1][j-1].setIsOpen(true);
-//            openPoints(i+1, j-1, pointsArray);
-//
-//            pointsArray[i-1][j].setIsOpen(true);
-//            openPoints(i-1, j, pointsArray);
-//
-//            pointsArray[i+1][j].setIsOpen(true);
-//            openPoints(i+1, j, pointsArray);
-//
-//            pointsArray[i-1][j+1].setIsOpen(true);
-//            openPoints(i-1, j+1, pointsArray);
-//
-//
-//            pointsArray[i][j+1].setIsOpen(true);
-//            openPoints(i, j+1, pointsArray);
-//
-//            pointsArray[i+1][j+1].setIsOpen(true);
-//            openPoints(i+1, j+1, pointsArray);
         }
     }
 }

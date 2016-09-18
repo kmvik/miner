@@ -24,51 +24,60 @@ public class Main extends Application {
         int n = 10;
         int m = 10;
         int bombsCount = 15;
+        double pointSize = 30;
+        int lifeCount = 0;
 
-        SquareAreaGenerator sag = new SquareAreaGenerator(n, m, bombsCount);
+        SquareAreaGenerator sag = new SquareAreaGenerator(n, m, bombsCount, pointSize, pointSize);
 
         primaryStage.setTitle("Miner");
         Group root = new Group();
-                List<PointBase> points = sag.generateArea();
+        List<PointBase> points = sag.generateArea();
         DrawerAreaWithSquarePoints drawer = new DrawerAreaWithSquarePoints(sag.getAreaHeightPx(), sag.getAreaWidthPx());
         Canvas canvasBomb = drawer.drawLayoutWithBombs(points);
         Canvas canvasTop = drawer.drawTopLayout(points);
-        GraphicsContext gc2 = canvasTop.getGraphicsContext2D();
         canvasTop.toFront();
-
-
 
         canvasTop.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
             double x = event.getSceneX();
             double y = event.getSceneY();
-            PointBase pointClicked = points.stream().filter(a -> x >= a.getPositionX() && x < a.getPositionX() + a.getPointWidth()
-            && y >= a.getPositionY() && y < a.getPositionY() + sag.heightPoint).collect(Collectors.toList()).get(0);
+            PointBase pointClicked = getClickedPoint(x, y, points);
             if (event.getButton() == MouseButton.PRIMARY && !pointClicked.hasFlag()) {
-                gc2.clearRect(pointClicked.getPositionX(), pointClicked.getPositionY(), sag.widthPoint, sag.heightPoint);
-//                pointClicked.setIsOpen(true);
-                if (pointClicked.hasBomb()) {
-                    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-                    alert.setTitle("Game over");
-                    alert.setHeaderText(null);
-                    alert.setContentText("Вы всё взорвали =( Хотите сыграть еще раз?");
-                    Optional<ButtonType> result = alert.showAndWait();
-                    if (result.get() == ButtonType.OK){
-                        // перезагрузка приложения
-                    } else {
-                        primaryStage.close();
-                    }
+                drawer.clearPoint(pointClicked);
+                if (pointClicked.hasBomb() && lifeCount == 0) {
+                        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                        alert.setTitle("Game over");
+                        alert.setHeaderText(null);
+                        alert.setContentText("Вы всё взорвали =(");
+                        Optional<ButtonType> result = alert.showAndWait();
+                        if (result.get() == ButtonType.OK){
+                            primaryStage.close();
+                        }
                 }
                 if (pointClicked.getNumber() == 0) {
-                    drawer.clearTopLayoutOnPoint(sag.openEmptyArea(points, pointClicked).stream().filter(p -> p.isOpen()).collect(Collectors.toList()));
+                    drawer.clearOpenedPoints(sag.openEmptyArea(points, pointClicked).stream().filter(p -> p.isOpen()).collect(Collectors.toList()));
+                } else {
+                    pointClicked.setIsOpen(true);
                 }
             }
             if (event.getButton() == MouseButton.SECONDARY && !pointClicked.isOpen()) {
                 if (pointClicked.hasFlag()) {
-                    gc2.fillRoundRect(pointClicked.getPositionX(), pointClicked.getPositionY(), sag.widthPoint, sag.heightPoint, 10, 10);
+                    drawer.drawDefaultPoint(pointClicked);
                     pointClicked.setHasFlag(false);
+                    sag.setMarkedBombs(sag.getMarkedBombs() - 1);
                 } else {
-                    gc2.drawImage(new Image("/flag.png"),pointClicked.getPositionX()+3,pointClicked.getPositionY()+3);
+                    drawer.drawFlag(pointClicked);
                     pointClicked.setHasFlag(true);
+                    sag.setMarkedBombs(sag.getMarkedBombs() + 1);
+                }
+            }
+            if (checkIsWin(points, bombsCount)) {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Вы выиграли");
+                alert.setHeaderText(null);
+                alert.setContentText("Вы выиграли. Поздравляем!");
+                Optional<ButtonType> result = alert.showAndWait();
+                if (result.get() == ButtonType.OK){
+                    primaryStage.close();
                 }
             }
         });
@@ -79,6 +88,20 @@ public class Main extends Application {
         primaryStage.show();
     }
 
+    private PointBase getClickedPoint(double x, double y, List<PointBase> points) {
+        return points.stream().filter(a -> x >= a.getPositionX()
+                && x < a.getPositionX() + a.getWidth()
+                && y >= a.getPositionY()
+                && y < a.getPositionY() + a.getHeight())
+                .collect(Collectors.toList())
+                .get(0);
+    }
+
+    private boolean checkIsWin(List<PointBase> points, int bombsCount) {
+        long pointsWithFlag = points.stream().filter(p -> p.hasFlag()).count();
+        long openedBombs = points.stream().filter(p -> p.hasBomb() && p.isOpen()).count();
+        return openedBombs + points.stream().filter(p -> p.hasBomb() && p.hasFlag()).count() == bombsCount && openedBombs + pointsWithFlag == bombsCount;
+    }
 
     public static void main(String[] args) {
         launch(args);

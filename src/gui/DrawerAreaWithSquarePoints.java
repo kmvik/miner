@@ -13,8 +13,7 @@ import java.util.List;
  */
 public class DrawerAreaWithSquarePoints {
     private final String BOMB_PATH = "/bomb.png";
-    private double areaHeight;
-    private double areaWidth;
+    private final String FLAG_PATH = "/flag.png";
     private final int ARC = 10;
     private Canvas cBombs;
     private GraphicsContext gcBombs;
@@ -22,8 +21,6 @@ public class DrawerAreaWithSquarePoints {
     private GraphicsContext gcTop;
 
     public DrawerAreaWithSquarePoints (double areaHeight, double areaWidth) {
-        this.areaHeight = areaHeight;
-        this.areaWidth = areaWidth;
         cBombs = new Canvas(areaWidth, areaHeight);
         cTop = new Canvas(areaWidth, areaHeight);
         gcBombs = cBombs.getGraphicsContext2D();
@@ -49,16 +46,28 @@ public class DrawerAreaWithSquarePoints {
     public Canvas drawTopLayout(List<PointBase> points) {
         for (PointBase point : points) {
             gcTop.setFill(Color.GREEN);
-            gcTop.fillRoundRect(point.getPositionX(), point.getPositionY(), point.getPointWidth(), point.getPointHeight(), ARC, ARC);
+            gcTop.fillRoundRect(point.getPositionX(), point.getPositionY(), point.getWidth(), point.getHeight(), ARC, ARC);
         }
         return cTop;
     }
 
-    public void clearTopLayoutOnPoint(List<PointBase> points) {
+    public void clearOpenedPoints(List<PointBase> points) {
         for (PointBase p : points) {
             if (p.isOpen()) {
-                gcTop.clearRect(p.getPositionX(), p.getPositionY(), p.getPointWidth(), p.getPointHeight());
+                gcTop.clearRect(p.getPositionX(), p.getPositionY(), p.getWidth(), p.getHeight());
             }
         }
+    }
+
+    public void clearPoint(PointBase point) {
+        gcTop.clearRect(point.getPositionX(), point.getPositionY(), point.getWidth(), point.getHeight());
+    }
+
+    public void drawFlag(PointBase point) {
+        gcTop.drawImage(new Image(FLAG_PATH),point.getPositionX()+3, point.getPositionY()+3);
+    }
+
+    public void drawDefaultPoint(PointBase point) {
+        gcTop.fillRoundRect(point.getPositionX(), point.getPositionY(), point.getWidth(), point.getHeight(), ARC, ARC);
     }
 }

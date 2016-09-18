@@ -4,15 +4,14 @@ package areaGenerator;
  * Created by mariya.chernyshova on 13.09.2016.
  */
 public abstract class PointBase {
-    private final double DEFAULT_POINT_SIZE = 30;
     protected double positionX;
     protected double positionY;
     protected boolean hasBomb;
     protected int number;
     protected boolean isOpen;
     protected boolean hasFlag;
-    protected double pHeight;
-    protected double pWidth;
+    protected double height;
+    protected double width;
 
     public double getPositionX() {
         return positionX;
@@ -22,15 +21,15 @@ public abstract class PointBase {
         return positionY;
     }
 
-    public PointBase(double positionX, double positionY) {
+    public PointBase(double positionX, double positionY, double height, double width) {
         this.positionX = positionX;
         this.positionY = positionY;
         this.hasBomb = false;
         this.number =  0;
         this.isOpen = false;
         this.hasFlag = false;
-        this.pHeight = DEFAULT_POINT_SIZE;
-        this.pWidth = DEFAULT_POINT_SIZE;
+        this.height = height;
+        this.width = width;
     }
 
     public boolean hasBomb() {
@@ -65,11 +64,11 @@ public abstract class PointBase {
         this.hasFlag = hasFlag;
     }
 
-    public double getPointHeight() {
-        return this.pHeight;
+    public double getHeight() {
+        return this.height;
     }
 
-    public double getPointWidth() {
-        return this.pWidth;
+    public double getWidth() {
+        return this.width;
     }
 }

@@ -7,8 +7,6 @@ import java.util.List;
  */
 public interface IAreaGenerator {
     public double interval = 1;
-    public double heightPoint = 30;
-    public double widthPoint = 30;
     List<PointBase> generateArea();
     void fillPositionsPoints();
     void fillNumbers();
